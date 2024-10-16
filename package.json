@@ -1,0 +1,31 @@
+{
+  "name": "chapter_seek",
+  "version": "1.0.0",
+  "description": "Um serviço em Node.js desenvolvido em TypeScript que realiza web scraping em sites de mangás para monitorar novos capítulos. Quando um novo capítulo é detectado, o serviço envia notificações automáticas para um canal ou grupo no Telegram utilizando a API do Telegram. Ideal para fãs de mangás que desejam atualizações em tempo real.",
+  "main": "server.js",
+  "scripts": {
+    "dev": "tsx watch src/server/server.ts"
+  },
+  "keywords": [
+    "Node.js",
+    "TypeScript",
+    "API",
+    "Telegram",
+    "Web Scraping",
+    "Manga",
+    "Notificações"
+  ],
+  "author": "Walisson (Sileniz)",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.4.5",
+    "node-fetch": "^3.3.2",
+    "telegraf": "^4.16.3"
+  }
+}
