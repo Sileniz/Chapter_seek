@@ -33,10 +33,10 @@ Chapter Seek é um serviço em Node.js desenvolvido com TypeScript que realiza *
 1. Clone este repositório:
 
    ```bash
-   git clone https://github.com/Sileniz/chapter_seek.git
+   git clone https://github.com/Sileniz/Chapter_seek.git
 2. Navegue até a pasta:
     ```bash
-    cd chapter_seek
+    cd Chapter_seek
 3. Instale as dependências::
     ```bash
     npm install
