@@ -9,6 +9,7 @@ interface ChapterInterface {
     manga: string;
     chapter: number;
     link: string;
+    remember: boolean
 }
 class Server {
     private filePath: string
@@ -24,6 +25,27 @@ class Server {
         this.bot.command('checkUpdate', () => this.checkFile('checkUpdate'));
         this.bot.command('addManga', (ctx) => this.addManga(ctx));
     }
+    public async remember(): Promise<void> {
+        fs.readFile(this.filePath, 'utf-8', async (err, data) => {
+            if (err) {
+                console.log(err)
+                return
+            }
+            let info = JSON.parse(data)
+            if (!info) {
+                return;
+            }
+            let arrMangas = info.filter((e: ChapterInterface) => e.remember  == true)
+            if(arrMangas.length > 0){
+                let message =  `Olá! estou aqui parar lembrar das obras que você deseja ser lembrada!\n`
+                for(let i = 0; i < arrMangas.length; i++){
+                    message = message.concat(`${arrMangas[i].manga}\n`)
+                }
+            this.bot.telegram.sendMessage(this.chatID, message)
+            }
+        })
+    }
+
     private async createFile(newComic: ChapterInterface): Promise<Boolean> {
         return new Promise((resolve, reject) => {
             let data = []
@@ -39,37 +61,37 @@ class Server {
             })
         })
     }
-    private async addManga(command: Context): Promise<void> {
-        command.reply('Envie o link do mangá')
-        let hearingMessages = true
-        this.bot.on('text', async (ctx) => {
-            if (hearingMessages) {
-                const message = ctx.message.text
 
-                const urlRegex = /https?:\/\/(www\.)?comick\.io(\/[^\s]*)?/;
-                const foundLink = message.match(urlRegex);
-                if (!foundLink) {
-                    ctx.reply("Link invalido")
-                    hearingMessages = false
-                    return
-                }
-                const comic = await this.fetchManga(message)
-                const newComic = {
-                    manga: comic.title,
-                    chapter: comic.last_chapter,
-                    link: message
-                }
-                fs.readFile(this.filePath, 'utf-8', async (err, data) => {
+    private async addManga(command: Context): Promise<void> {
+        await command.reply('Envie o link do mangá')
+        this.bot.on('text', async (ctx) => {
+            const message = ctx.message.text
+            if(!message.includes('add')) return;
+            const arrMessage = message.split(' ')
+            const link = arrMessage[1]
+            const remember = arrMessage[2]
+            const urlRegex = /https?:\/\/(www\.)?comick\.io(\/[^\s]*)?/;
+            const foundLink = link.match(urlRegex);
+            if (!foundLink) {
+                ctx.reply("Link invalido")
+                return
+            }
+            const comic = await this.fetchManga(link)
+            const newComic = {
+                manga: comic.title,
+                chapter: comic.last_chapter,
+                link: link,
+                remember: remember == 'sim' ? true : false
+            }
+            fs.readFile(this.filePath, 'utf-8', async (err, data) => {
                     if (err && err.code === 'ENOENT') {
                         const result = await this.createFile(newComic)
                         result ? ctx.reply('Manga adicionado com sucesso') : ctx.reply('Houve um erro ao criar o arquivo');
-                        hearingMessages = false
                         return
                     }
                     let info = JSON.parse(data)
                     if (info && info.find((e: any) => e.manga == newComic.manga)) {
                         ctx.reply('Mangá já existe na base de dados')
-                        hearingMessages = false
                         return
                     }
                     info.push(newComic)
@@ -77,15 +99,13 @@ class Server {
                         if (err) {
                             console.error(err)
                             ctx.reply('Houve um erro ao adicionar o mangá')
-                            hearingMessages = false
                             return
                         }
                     })
                     ctx.reply('Mangá adicionado com sucesso')
-                    hearingMessages = false
                 })
             }
-        })
+        )
     }
 
     public async checkFile(command: string | null): Promise<void> {
@@ -97,7 +117,7 @@ class Server {
             let info = JSON.parse(data)
             if (info) {
                 await Promise.all(info.map((infoItem: any) =>
-                    this.initCheck(infoItem.manga, infoItem.chapter, infoItem.link, command)
+                    this.initCheck(infoItem.manga, infoItem.chapter, infoItem.link, infoItem.remember, command)
                 ))
             }
         })
@@ -146,9 +166,9 @@ class Server {
         return comic
     }
 
-    private async initCheck(manga: string, chapter: string, link: string, command: string | null): Promise<void> {
+    private async initCheck(manga: string, chapter: string, link: string, remember: boolean, command: string | null): Promise<void> {
         try {
-            const { comic } = await this.fetchManga(link)
+            const comic = await this.fetchManga(link)
             if (!comic || manga !== comic.title) {
                 await this.bot.telegram.sendMessage(this.chatID, `Há um título inconsistente na base de dados: ${manga}`)
                 console.log(`Há um título inconsistente na base de dados: ${manga}`)
@@ -176,4 +196,5 @@ class Server {
     }
 }
 const server = new Server()
+setInterval(() => server.remember(), 18000000) // Espera de 5 horas
 setInterval(() => server.checkFile(null), 600000) //Codigo com intervalo pra ser executado durante um periodo de tempo
