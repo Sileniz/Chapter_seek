@@ -52,8 +52,9 @@ Chapter Seek é um serviço em Node.js desenvolvido com TypeScript que realiza *
 1. Envie comando para adicionar o primeiro mangá
     ```bash
     /addManga
-<span></span>
+
 Só enviar um link de um mangá pela comick e ele adicionara.
+
 2. Para iniciar o serviço em modo de desenvolvimento, execute:
     ```bash
     npm run dev
