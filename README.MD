@@ -49,18 +49,11 @@ Chapter Seek é um serviço em Node.js desenvolvido com TypeScript que realiza *
 - **CHAT_ID**: O ID do grupo ou canal onde as notificações serão enviadas. Você pode obter o Chat ID utilizando o bot @userinfobot no Telegram.
 
 ## Uso
-1. Criar arquivo chapters.json
+1. Envie comando para adicionar o primeiro mangá
     ```bash
-    [
-    {
-        "manga": "The Greatest Estate Developer",
-        "chapter": 
-        "link": "https://comick.io/comic/04-the-greatest-estate-developer"
-    }
-    ]
-- **manga**: O nome do mangá.
-- **chapter**: O último capítulo registrado.
-- **link**: O link para a página do mangá a ser monitorado.
+    /addManga
+
+Só enviar um link de um mangá pela comick e ele adicionara.
 
 2. Para iniciar o serviço em modo de desenvolvimento, execute:
     ```bash
